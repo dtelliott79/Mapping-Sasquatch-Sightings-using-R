@@ -1,0 +1,45 @@
+---
+title: "Week 2 Project"
+author: "David Elliott"
+date: "December 21, 2016"
+output: html_document
+---
+
+# Sasquatch, aka. Bigfoot, aka. Gigantopithecus sightings!!!
+Each Class A reported sighting is marked by a foot icon. Click on the icon for a URL to more information!!!
+
+```{r options}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r map}
+gps <- read.csv("Bigfoot Reports Class A.csv", header=FALSE)
+gps <- gps[,1:3]
+colnames(gps)[1] <- 'long'
+colnames(gps)[2] <- 'lat'
+LatLong <- gps[,1:2]
+
+library(stringr)
+url_pattern <- "http://.*"
+LatLong$ContentURL <- str_extract(gps[,3], "https?:\\/\\/\\S*")
+
+library(leaflet)
+
+Icon <- makeIcon(
+        iconUrl = "foot-print-308596_640.png",
+        iconWidth = 18, iconHeight = 20,
+        iconAnchorX = 18/2, iconAnchorY = 16 
+)
+
+Sites <- as.character(LatLong$ContentURL)
+
+
+LatLong %>%
+        leaflet() %>%
+        addTiles() %>%
+        addMarkers(icon = Icon, popup = Sites)
+```
+
+CREDIT: These data were obtained from the Bigfoot Field Researchers Organization (BFRO). More info http://www.bfro.net/
+
+DISCLAIMER: The author of this analysis makes no claims as to the validity or accuracy of the results. Remember, trash in, trash out.
